@@ -2,17 +2,19 @@ package test.java;
 
 import java.io.File;
 
+import main.constantes.Cibles;
+import main.constantes.Constantes;
+
+import org.junit.Test;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
 
-import beans.CasEssaiBean;
-import exceptions.SeleniumException;
-import main.constantes.Cibles;
-import main.constantes.Constantes;
 import outils.ALMOutils;
 import outils.PropertiesOutil;
 import outils.SeleniumOutils;
 import outils.XLSOutils;
+import beans.CasEssaiBean;
+import exceptions.SeleniumException;
 
 /**
  * Classe contenant les fonctions communes entre les différents scenario.
@@ -166,20 +168,22 @@ public class SC00Test extends CasEssaiBean {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// FONCTION COMMUNES :
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public String accesIzigate(SeleniumOutils outil) throws SeleniumException {
-		String login = PropertiesOutil.getInfoConstante("IZIGATE.login");
-		String password = PropertiesOutil.getInfoConstante("IZIGATE.password");
-		String url = Constantes.URL_IZIGATE;
+	public void accesSynthese(SeleniumOutils outil) throws SeleniumException {
+		String login = Constantes.LOGIN_UNITED;
+		String password = Constantes.PASSWORD_UNITED;
+		String profil = Constantes.PROFIL_UTILISATEUR;
+		String url = Constantes.URL_SYNTHESE;
+		url = url.replace("[IUN]", "5333383");
+		url = url.replace("[DISTRIBUTEUR]", "BP");
+		url = url.replace("[LOGIN UNITED]", login);
+		url = url.replace("[MDP UNITED]", password);
+		url = url.replace("[SAVCCO_DOM_M]", profil);
+		
+		System.out.println(url);
+		
 		outil.chargerUrl(url);
 		// Attente de l'affichage du titre de la page
-		outil.attendreChargementPage(Constantes.TITRE_PAGE_IZIGATE);
-		// Génération de la chaine du Jeton	
-		outil.viderEtSaisir(login, Cibles.SAISIE_LOGIN);
-		outil.viderEtSaisir(password, Cibles.SAISIE_MDP);
-		// Chargement d'IZIVENTE
-		outil.cliquer(Cibles.BOUTON_VALIDATION_LOGIN);
-		String retour = "Accès à Izigate OK";
-		return retour;
+		//outil.attendreChargementPage(Constantes.TITRE_PAGE_IZIGATE);
 	}
 	
 

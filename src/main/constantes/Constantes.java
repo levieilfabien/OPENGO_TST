@@ -24,9 +24,26 @@ public class Constantes {
 //	public static final String REPERTOIRE_TEST = PropertiesOutil.getInfoConstante("REPERTOIRE_TEST");
 //	public static final String REPERTOIRE_TEST2 = PropertiesOutil.getInfoConstante("REPERTOIRE_TEST2");
 
-	public static final String URL_IZIGATE = PropertiesOutil.getInfoConstante("URL_IZIGATE_RECETTE");
-	
-	public static final String TITRE_PAGE_IZIGATE = "IZIGATE - Login";
+	/**
+	 * URL d'accès direct à la synthèse
+	 */
+	public static final String URL_SYNTHESE = PropertiesOutil.getInfoEnvConstante("SYNTHESE");
+	/**
+	 * Login de l'utilisateur UNITED à utiliser.
+	 */
+	public static final String LOGIN_UNITED = PropertiesOutil.getInfoEnvConstante("LOGIN_UNITED");
+	/**
+	 * Mot de passe associé à l'utilisateur UNITED à utiliser.
+	 */
+	public static final String PASSWORD_UNITED = PropertiesOutil.getInfoEnvConstante("PASSWORD_UNITED");
+	/**
+	 * Profil utilisateur à utiliser pour l'affichage de la synthèse.
+	 */
+	public static final String PROFIL_UTILISATEUR = PropertiesOutil.getInfoEnvConstante("PROFIL");
+	/**
+	 * Titre de la page de synthèse.
+	 */
+	public static final String TITRE_PAGE_SYNTHESE = "TEMP";
 
 	////////////////////////////////////////////////////INFORMATIONS POUR LES PREFERENCES ////////////////////////////////////////////////////////////
 	public static final String PREF_FIREFOX_REPERTOIRE_TELECHARGEMENT = "browser.download.dir";
