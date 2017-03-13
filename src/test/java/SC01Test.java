@@ -22,7 +22,11 @@ public class SC01Test extends SC00Test {
 		
 		//Description du scénario
 		CasEssaiOpengoBean scenario0 = new CasEssaiOpengoBean();
+		scenario0.setAlm(true);
+		scenario0.setNomCasEssai("SC02 - Accès synthèse et vérification des zooms pour un dossier au recouvrement");
+		scenario0.setIdUniqueTestLab(55891);
 		//Configuration du driver
+		System.setProperty("webdriver.gecko.driver", Constantes.EMPLACEMENT_GECKO);
 		FirefoxBinary ffBinary = new FirefoxBinary(new File(Constantes.EMPLACEMENT_FIREFOX));
 		FirefoxProfile profile = configurerProfilNatixis();
 		//Création et configuration du repertoire de téléchargement
@@ -32,7 +36,8 @@ public class SC01Test extends SC00Test {
 		String repertoire = creerRepertoireTelechargement(scenario0, profile);
 		scenario0.setRepertoireTelechargement(repertoire);
 		// Initialisation du driver
-		FirefoxImpl driver = new FirefoxImpl(ffBinary, profile);
+		//FirefoxImpl driver = new FirefoxImpl(ffBinary, profile);
+		FirefoxImpl driver = new FirefoxImpl(profile);
 		// LISTE DES OBJECTIFS DU CAS DE TEST
 		scenario0.ajouterObjectif(new ObjectifBean("Test arrivé à terme", scenario0.getNomCasEssai() + scenario0.getTime()));
 	   
@@ -42,7 +47,7 @@ public class SC01Test extends SC00Test {
 	    try {
 			//CT01 - Initialisation et accès à Izigate
 			//CT02 - Consultation d'un dossier
-	    	accesSynthese(outil);
+	    	accesSynthese(outil, scenario0);
 			//scenario0.getTests().add();
 			
 		} catch (SeleniumException ex) {

@@ -36,6 +36,15 @@ public class CasEssaiOpengoBean extends CasEssaiBean {
 	public CasEssaiOpengoBean() {
 		super();
 	}
+	
+	public CasEssaiOpengoBean(CasEssaiOpengoBean reference, String prefixe, Integer idTestPlan) {
+		super();
+		setAlm(reference.getAlm());
+		setNomCasEssai(prefixe + reference.getTime());
+		setIdUniqueTestLab(reference.getIdUniqueTestLab());
+		setIdUniqueTestPlan(idTestPlan);
+		reference.getTests().add(this);
+	}
 
 	public String getNumeroIUN() {
 		return numeroIUN;

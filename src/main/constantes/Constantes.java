@@ -13,7 +13,7 @@ public class Constantes {
 	//////////////////////////////////////////////////// INFORMATIONS TECHNIQUES ////////////////////////////////////////////////////////////////
 	public static final String EMPLACEMENT_FIREFOX = PropertiesOutil.getInfoConstante("EMPLACEMENT_FIREFOX");
 	public static final String EMPLACEMENT_PROFIL = PropertiesOutil.getInfoConstante("EMPLACEMENT_PROFILE");
-	
+	public static final String EMPLACEMENT_GECKO = PropertiesOutil.getInfoConstante("EMPLACEMENT_GECKO");
 	
 	//////////////////////////////////////////////////// INFORMATIONS POUR LES TESTS ////////////////////////////////////////////////////////////
 	
@@ -36,6 +36,14 @@ public class Constantes {
 	 * Mot de passe associé à l'utilisateur UNITED à utiliser.
 	 */
 	public static final String PASSWORD_UNITED = PropertiesOutil.getInfoEnvConstante("PASSWORD_UNITED");
+	/**
+	 * Login de l'utilisateur windows à utiliser.
+	 */
+	public static final String LOGIN_ALM = PropertiesOutil.getInfoConstante("ALM.login");
+	/**
+	 * Mot de passe associé à l'utilisateur windows à utiliser.
+	 */
+	public static final String PASSWORD_ALM = PropertiesOutil.getInfoConstante("ALM.password");
 	/**
 	 * Profil utilisateur à utiliser pour l'affichage de la synthèse.
 	 */
