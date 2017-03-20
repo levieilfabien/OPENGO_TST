@@ -8,8 +8,10 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
 
 import beans.CasEssaiBean;
+import beans.ObjectifBean;
 import constantes.Erreurs;
 import exceptions.SeleniumException;
+import extensions.SeleniumALMRESTWrapper;
 import main.bean.CasEssaiOpengoBean;
 import main.constantes.Cibles;
 import main.constantes.Constantes;
@@ -100,11 +102,11 @@ public class SC00Test extends CasEssaiBean {
 	 * @param casEssai le cas d'essai concerné par le test.
 	 * @throws SeleniumException en cas d'erreur lors de la génération du fichier excel de rapport.
 	 */
-	private void finaliserTest(SeleniumOutils outils, CasEssaiBean casEssai, final String idObjectif, boolean succes) throws SeleniumException {
+	private void finaliserTest(SeleniumOutils outils, CasEssaiBean casEssai, final String idObjectif, Boolean succes) throws SeleniumException {
 		// On finalise aussi les sous cas.
-		for(CasEssaiBean sousCas : casEssai.getTests()) {
-			finaliserTest(outils, sousCas, casEssai.getNomCasEssai() + casEssai.getTime(), sousCas.getEtatFinal());
-		}
+//		for(CasEssaiBean sousCas : casEssai.getTests()) {
+//			finaliserTest(outils, sousCas, casEssai.getNomCasEssai() + casEssai.getTime(), sousCas.getEtatFinal());
+//		}
 		// Si le driver n'est pas nul on effectue des capture d'écran et on récupère les logs.
 		if (outils != null) {
 			casEssai.setRegistreExecution(outils.getDriver());
@@ -115,6 +117,21 @@ public class SC00Test extends CasEssaiBean {
 				outils.captureEcran("captureFinale" + casEssai.getNomCasEssai(), casEssai.getNomCasEssai());
 			}
 		}
+		
+//		if (succes == null) {
+//			succes = true;
+//			for (ObjectifBean step : casEssai.getObjectifs().values()) {
+//				if (step.isStep()) {
+//					if (null == step.getEtat()) {
+//						succes = null;
+//					} else if (step.getEtat() == false) {
+//						succes = false;
+//						break;
+//					}
+//				}
+//			}
+//		}
+		
 		// On valide l'objectif en fonction du succès du cas de test.
 		casEssai.validerObjectif(outils.getDriver(), idObjectif, succes);
 		//setCasEssai(casEssai);
@@ -131,8 +148,8 @@ public class SC00Test extends CasEssaiBean {
 		
 		// On tente de mettre à jour ALM
 		if (casEssai.getAlm()) {
-			ALMOutils.miseAJourTestSet(casEssai, succes);
-			System.out.println("Mise à jour dans ALM");
+			SeleniumALMRESTWrapper.miseAJourTestSet(casEssai, succes);
+			System.out.println("Mise à jour dans ALM terminée");
 		}
 	}
 	
@@ -144,7 +161,9 @@ public class SC00Test extends CasEssaiBean {
 	 * @throws SeleniumException en cas d'erreur.
 	 */
 	public final void finaliserTest(SeleniumOutils outil, CasEssaiBean casEssai, final String idObjectif) throws SeleniumException {
-		finaliserTest(outil, casEssai, idObjectif, true);
+		// Ce n'est pas car il n'y a pas d'erreur que le test se finalise en étant ok.
+		//TODO à voir les conséquences
+		finaliserTest(outil, casEssai, idObjectif, null);
 	}
 	
 	/**
@@ -212,6 +231,7 @@ public class SC00Test extends CasEssaiBean {
 		CT12.ajouterStep("Vérifier la présence des informations sur le motif du retard si il y en a un", "ACCES", "Les informations sont bien présente si ce dossier dispose d'un retard");
 		CasEssaiOpengoBean CT13 = new CasEssaiOpengoBean(reference, "CT13-", 78957);
 		CT13.ajouterStep("Accès à la MAJ Client depuis le bouton dédié", "ACCES", "La MAJ Client s'affiche sur l'onglet client");
+		CT13.ajouterStep("Vérifier la présence des blocs relatif à la nature du dossier dans la MAJ Client", "VERIFICATION", "Les blocs sont conformes");
 		CasEssaiOpengoBean CT14 = new CasEssaiOpengoBean(reference, "CT14-", 78958);
 		CT14.ajouterStep("Quitter la MAJ Client", "QUITTER", "La synthèse s'affiche pour le client");
 		CasEssaiOpengoBean CT15 = new CasEssaiOpengoBean(reference, "CT15-", 78959);
@@ -234,8 +254,16 @@ public class SC00Test extends CasEssaiBean {
 		url = url.replace("[SAVCCO_DOM_M]", profil);
 		
 		System.out.println(url);
-		
 		outil.chargerUrl(url);
+		
+		// La présence d'une erreur générale indique qu'il est impossible d'accèder à l'IHM
+		//if (outil.testerPresenceTexte("Erreur générale", true)) {
+			
+		if (outil.testerPresenceElementDiffere(Cibles.BLOC_MESSAGE_ERREUR)) {	
+			CT01.invalider(outil, "ACCES");
+		} else {
+			CT01.valider(outil, "ACCES");
+		}
 		
 		CT01.validerObjectif(outil.getDriver(), "ACCES", true);
 		////////////////////////////////////////////////////
@@ -263,14 +291,18 @@ public class SC00Test extends CasEssaiBean {
 		CT03.validerObjectif(outil.getDriver(), "QUITTER", true);
 		
 		outil.cliquer(Cibles.ZOOM_ADRESSE2);
+		CT04.validerObjectif(outil.getDriver(), "ACCES", true);
 		if (!outil.obtenirValeur(Cibles.ZOOM_POPUP_ADRESSE_CORRESPONDANCE).contains(adresseLigne2)) {
+			CT04.validerObjectif(outil.getDriver(), "VERIFICATION", false);
 			throw new SeleniumException(Erreurs.E034, "Le zoom ne contient pas l'adresse : " + adresseLigne2);
 		}
+		CT04.validerObjectif(outil.getDriver(), "VERIFICATION", true);
 		outil.cliquer(Cibles.ZOOM_ADRESSE2);
 		if (outil.testerPresenceElement(Cibles.ZOOM_POPUP_ADRESSE_CORRESPONDANCE)) {
+			CT04.validerObjectif(outil.getDriver(), "QUITTER", false);
 			throw new SeleniumException(Erreurs.E035, "Le zoom n'as pas disparu lors d'un clic à l'extérieur de celui-ci.");
 		}
-		
+		CT04.validerObjectif(outil.getDriver(), "QUITTER", true);
 		////////////////////////////////////////////////////
 		// VERIFICATIONS RELATIVE AU ZOOM TELEPHONE
 		////////////////////////////////////////////////////
@@ -278,21 +310,27 @@ public class SC00Test extends CasEssaiBean {
 		// On ne teste que le client dispose d'un numéro de téléphone.
 		if (telephone != null && !"".equals(telephone)) {
 			outil.cliquer(Cibles.ZOOM_TELEPHONE);
+			CT05.validerObjectif(outil.getDriver(), "ACCES", true);
 			if (!outil.obtenirValeur(Cibles.ZOOM_POPUP_TELEPHONE).contains(telephone)) {
+				CT05.validerObjectif(outil.getDriver(), "VERIFICATION", false);
 				throw new SeleniumException(Erreurs.E034, "Le zoom ne contient pas le numéro de téléphone : " + telephone);
 			}
+			CT05.validerObjectif(outil.getDriver(), "VERIFICATION", true);
 			outil.cliquer(Cibles.ZOOM_TELEPHONE);
+			CT05.validerObjectif(outil.getDriver(), "QUITTER", true);
 		}
 		////////////////////////////////////////////////////
 		// VERIFICATIONS RELATIVE AU ZOOM CREDIT
 		////////////////////////////////////////////////////
-		outil.cliquer(Cibles.ZOOM_CREDIT);
+		outil.attendreEtCliquer(Cibles.ZOOM_CREDIT);
 		outil.attendreChargementElement(Cibles.ZOOM_POPUP_CREDIT, true, true);
 		if (!outil.testerPresenceElement(Cibles.ZOOM_POPUP_CREDIT)) {
+			CT06.validerObjectif(outil.getDriver(), "ACCES", false);
 			throw new SeleniumException(Erreurs.E009, "Le zoom crédit n'apparais pas : " + Cibles.ZOOM_POPUP_CREDIT);
 		}
+		CT06.validerObjectif(outil.getDriver(), "ACCES", true);
 		outil.cliquer(Cibles.ZOOM_CREDIT);
-		
+		CT06.validerObjectif(outil.getDriver(), "QUITTER", true);
 		////////////////////////////////////////////////////
 		// VERIFICATIONS RELATIVE AU ZOOM CONTRAT (cette fois pour tous les contrats du client)
 		////////////////////////////////////////////////////
@@ -311,29 +349,37 @@ public class SC00Test extends CasEssaiBean {
 				dossier.click();
 				outil.attendreChargementElement(Cibles.ZOOM_POPUP_CONTRAT, true, true);
 				if (!outil.testerPresenceElement(Cibles.ZOOM_POPUP_CONTRAT)) {
+					CT07.validerObjectif(outil.getDriver(), "ACCES", false);
 					throw new SeleniumException(Erreurs.E009, "Le zoom contrat n'apparais pas alors que le dossier " + numeroDossier + " est au recouvrement.");
 				}
+				CT07.validerObjectif(outil.getDriver(), "ACCES", true);
 				dossier.click();
+				CT07.validerObjectif(outil.getDriver(), "QUITTER", true);
 				////////////////////////////////////////////////////
 				// VERIFICATIONS RELATIVE A L'INFO RET
 				////////////////////////////////////////////////////
 				WebElement infoRet = outil.obtenirElement(element, "../../../td[12]"); //.findElement(By.xpath("../../../td[12]"));
 				String valeurSRECSynthese = "";
 				infoRet.click();
-				
+				CT07.valider(outil, "ACCES2");
 				WebElement valeurSRECInfoRet = outil.obtenirElement(Cibles.BLOC_INFO_RET_SITUATION_ACTUELLE, "./tr[2]/td[2]/span");
 				// On vérifie que le SREC qui s'affiche dans l'info RET est conforme au SREC affiché dans la synthèse
 				if (!valeurSRECSynthese.equals(outil.obtenirValeur(valeurSRECInfoRet))) {
+					CT07.invalider(outil, "VERIFICATION2");
 					throw new SeleniumException(Erreurs.E034, "L'info RET ne contient pas le SREC attendu : " + valeurSRECSynthese);
 				}
+				CT07.valider(outil, "VERIFICATION2");
 				////////////////////////////////////////////////////
 				// VERIFICATIONS RELATIVE A L'ACTUALITE GC
 				////////////////////////////////////////////////////
 				// Pour un dossier au recouvrement on s'attend à trouver le bloc d'actualité GC 
 				if (!outil.testerPresenceElement(Cibles.BLOC_ACTUALITE_GC)) {
+					CT11.invalider(outil, "VERIFICATION");
 					throw new SeleniumException(Erreurs.E009, "Le bloc actualité GC n'apparais pas alors que le dossier " + numeroDossier + " est au recouvrement.");
 				}
+				CT11.valider(outil, "VERIFICATION");
 				outil.attendreEtCliquer(Cibles.QUITTER_INFO_RET);
+				CT07.valider(outil, "QUITTER2");
 			}
 		}
 		
@@ -343,34 +389,48 @@ public class SC00Test extends CasEssaiBean {
 		String nomEmprunteur = outil.obtenirValeur(Cibles.NOM_EMPRUNTEUR);
 		outil.cliquer(Cibles.ZOOM_ROLE);
 		outil.attendreChargementElement(Cibles.ZOOM_POPUP_ROLE, true, true);
+		CT08.valider(outil, "ACCES");
 		if (!outil.obtenirValeur(Cibles.ZOOM_POPUP_ROLE).contains(nomEmprunteur)) {
+			CT08.invalider(outil, "VERIFICATION");
 			throw new SeleniumException(Erreurs.E034, "Le zoom role ne contient pas le nom de l'emprunteur : " + nomEmprunteur);
 		}
+		CT08.valider(outil, "VERIFICATION");
 		outil.cliquer(Cibles.ZOOM_ROLE);
-		
+		CT08.valider(outil, "QUITTER");
 		////////////////////////////////////////////////////
 		// VERIFICATIONS RELATIVE AU ZOOM MENS
 		////////////////////////////////////////////////////
 		outil.cliquer(Cibles.ZOOM_MENS);
 		outil.attendreChargementElement(Cibles.ZOOM_POPUP_MENS, true, true);
+		CT09.valider(outil, "ACCES");
 		if (!outil.obtenirValeur(Cibles.ZOOM_POPUP_MENS).contains(nomEmprunteur)) {
 			throw new SeleniumException(Erreurs.E034, "Le zoom mens ne contient pas le nom de l'emprunteur : " + nomEmprunteur);
 		}
 		outil.cliquer(Cibles.ZOOM_MENS);
-		
+		CT09.valider(outil, "QUITTER");
 		////////////////////////////////////////////////////
 		// ACCES A LA MAJ CLIENT = Onglet Client
 		////////////////////////////////////////////////////
 		outil.cliquer(Cibles.BOUTON_MAJ_CLIENT);
 		// Une fois la MAJ Client affichée, on vérifie la présence des blocs attendus.
 		outil.attendreChargementElement(Cibles.BOUTON_RETOUR_MAJ_CLIENT_CLIENT);
+		CT13.valider(outil, "ACCES");
 		if (!outil.testerPresenceElement(Cibles.BLOC_ETAT_CIVIL_CLIENT)) {
+			CT13.invalider(outil, "VERIFICATION");
 			throw new SeleniumException(Erreurs.E009, "Le bloc état CIVIL n'apparais pas alors que l'on est sur l'onglet client de la MAJ Client.");
 		}
 		if (recouvrement && !outil.testerPresenceElement(Cibles.BLOC_EVENEMENT_CLIENT)) {
+			CT13.invalider(outil, "VERIFICATION");
 			throw new SeleniumException(Erreurs.E009, "Le bloc évènement client n'apparais pas alors que le client dispose d'un dossier au recouvrement.");
 		}
-		outil.cliquerEtAttendre(Cibles.BOUTON_RETOUR_MAJ_CLIENT_CLIENT, Cibles.PICTO_MODIFICATION_ADRESSE);
+		CT13.valider(outil, "VERIFICATION");
+		try {
+			outil.cliquerEtAttendre(Cibles.BOUTON_RETOUR_MAJ_CLIENT_CLIENT, Cibles.PICTO_MODIFICATION_ADRESSE);
+			CT14.valider(outil, "QUITTER");
+		} catch (SeleniumException ex) {
+			CT14.invalider(outil, "QUITTER");
+			throw ex;
+		}
 		
 		////////////////////////////////////////////////////
 		// ACCES A LA MAJ CLIENT = Onglet Moyens de contact
@@ -379,10 +439,17 @@ public class SC00Test extends CasEssaiBean {
 		// Une fois la MAJ Client affichée, on vérifie la présence des blocs attendus.
 		outil.attendreChargementElement(Cibles.BOUTON_RETOUR_MAJ_CLIENT_CONTACT);
 		if (!outil.testerPresenceElement(Cibles.BLOC_MODIFICATION_ADRESSE)) {
+			CT15.invalider(outil, "ACCES");
 			throw new SeleniumException(Erreurs.E009, "Le bloc des coordonnées n'apparais pas alors que l'on est sur l'onglet Moyens de contact de la MAJ Client.");
 		}
-		outil.cliquerEtAttendre(Cibles.BOUTON_RETOUR_MAJ_CLIENT_CONTACT, Cibles.BOUTON_MAJ_CLIENT);
-		
+		CT15.valider(outil, "ACCES");
+		try {
+			outil.cliquerEtAttendre(Cibles.BOUTON_RETOUR_MAJ_CLIENT_CONTACT, Cibles.BOUTON_MAJ_CLIENT);
+			CT15.valider(outil, "QUITTER");
+		} catch (SeleniumException ex) {
+			CT15.invalider(outil, "QUITTER");
+			throw ex;
+		}
 		////////////////////////////////////////////////////
 		// ACCES AU JDM
 		////////////////////////////////////////////////////
@@ -390,14 +457,18 @@ public class SC00Test extends CasEssaiBean {
 		
 		//TODO Le JDM demande en recette une nouvelle identification, pour se faire il faut utiliser le user windows.
 		if (outil.testerPresenceElementDiffere(Cibles.LOGIN_JDM)) {
+			CT16.valider(outil, "ACCES");
 			outil.saisir(Constantes.LOGIN_ALM, Cibles.LOGIN_JDM);
 			outil.saisir(Constantes.PASSWORD_ALM, Cibles.PASSWORD_JDM);
 			outil.cliquer(Cibles.VALIDER_LOGIN_JDM);
 		}
 		
 		if(!outil.testerPresenceElementDiffere(Cibles.BLOC_PRINCIPAL_JDM)) {
+			CT16.invalider(outil, "IDENTIFICATION");
 			throw new SeleniumException(Erreurs.E009, "Le JDM n'apparais pas.");
 		}
+		CT16.valider(outil, "ACCES");
+		CT16.valider(outil, "IDENTIFICATION");
 	}
 	
 

@@ -6,6 +6,11 @@ import constantes.Clefs;
 public class Cibles {
 	//////////////////////////////////////////////////////CIBLE A USAGE UNIQUE ///////////////////////////////////////////////////////////////
 	/**
+	 * Indique le bloc dans lequel les messages d'erreurs sont affichés.
+	 */
+	public static final CibleBean BLOC_MESSAGE_ERREUR = new CibleBean("msg");
+	
+	/**
 	 * Zone de saisie de l'identifiant de l'utilisateur
 	 */
 	public static final CibleBean SAISIE_LOGIN =  new CibleBean(Clefs.NAME, "user");

@@ -43,6 +43,9 @@ public class CasEssaiOpengoBean extends CasEssaiBean {
 		setNomCasEssai(prefixe + reference.getTime());
 		setIdUniqueTestLab(reference.getIdUniqueTestLab());
 		setIdUniqueTestPlan(idTestPlan);
+		setRepertoireTelechargement(reference.getRepertoireTelechargement());
+		// Par défaut on ne connais pas l'état final de cette étape, elle sera déduite de la sommes de ses steps.
+		setEtatFinal(null);
 		reference.getTests().add(this);
 	}
 

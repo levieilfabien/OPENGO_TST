@@ -1,19 +1,15 @@
 package test.java;
 
-import java.io.File;
+import org.junit.Test;
+import org.openqa.selenium.firefox.FirefoxProfile;
 
+import beans.ObjectifBean;
+import exceptions.SeleniumException;
 import main.bean.CasEssaiOpengoBean;
 import main.constantes.Constantes;
 import moteurs.FirefoxImpl;
 import moteurs.GenericDriver;
-
-import org.junit.Test;
-import org.openqa.selenium.firefox.FirefoxBinary;
-import org.openqa.selenium.firefox.FirefoxProfile;
-
 import outils.SeleniumOutils;
-import beans.ObjectifBean;
-import exceptions.SeleniumException;
 
 public class SC01Test extends SC00Test {
 
@@ -23,16 +19,19 @@ public class SC01Test extends SC00Test {
 		//Description du scénario
 		CasEssaiOpengoBean scenario0 = new CasEssaiOpengoBean();
 		scenario0.setAlm(true);
-		scenario0.setNomCasEssai("SC02 - Accès synthèse et vérification des zooms pour un dossier au recouvrement");
+		scenario0.setDescriptif("SC02 - Accès synthèse et vérification des zooms pour un dossier au recouvrement");
+		scenario0.setNomTestLab("SC02 - Accès synthèse et vérification des zooms pour un dossier au recouvrement");
+		scenario0.setNomCasEssai("SC02-" + getTime());
 		scenario0.setIdUniqueTestLab(55891);
 		//Configuration du driver
 		System.setProperty("webdriver.gecko.driver", Constantes.EMPLACEMENT_GECKO);
-		FirefoxBinary ffBinary = new FirefoxBinary(new File(Constantes.EMPLACEMENT_FIREFOX));
+		//FirefoxBinary ffBinary = new FirefoxBinary(new File(Constantes.EMPLACEMENT_FIREFOX));
 		FirefoxProfile profile = configurerProfilNatixis();
 		//Création et configuration du repertoire de téléchargement
 		//File repertoireTelechargement = new File(".\\" + scenario0.getNomCasEssai());
 		//repertoireTelechargement.mkdir();
 		//profile.setPreference(Constantes.PREF_FIREFOX_REPERTOIRE_TELECHARGEMENT, repertoireTelechargement.getAbsolutePath());
+		
 		String repertoire = creerRepertoireTelechargement(scenario0, profile);
 		scenario0.setRepertoireTelechargement(repertoire);
 		// Initialisation du driver
@@ -43,6 +42,8 @@ public class SC01Test extends SC00Test {
 	   
 	    SeleniumOutils outil = new SeleniumOutils(driver, GenericDriver.FIREFOX_IMPL);
 	    outil.setRepertoireRacine(scenario0.getRepertoireTelechargement());
+
+	    
 	    
 	    try {
 			//CT01 - Initialisation et accès à Izigate
