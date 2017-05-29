@@ -42,12 +42,8 @@ public class SC01Test extends SC00Test {
 	   
 	    SeleniumOutils outil = new SeleniumOutils(driver, GenericDriver.FIREFOX_IMPL);
 	    outil.setRepertoireRacine(scenario0.getRepertoireTelechargement());
-
-	    
 	    
 	    try {
-			//CT01 - Initialisation et accès à Izigate
-			//CT02 - Consultation d'un dossier
 	    	accesSynthese(outil, scenario0);
 			//scenario0.getTests().add();
 			
